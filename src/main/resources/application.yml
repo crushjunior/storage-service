@@ -1,0 +1,69 @@
+server:
+  port: ${PORT}
+
+service:
+  version: '@project.version@'
+
+spring:
+  application:
+    name: '@project.artifactId@'
+  datasource:
+    url: jdbc:postgresql://${PSQL_DATASOURCE_URL}:5432/StorageDB
+    username: ${PSQL_DATASOURCE_USERNAME}
+    password: ${PSQL_DATASOURCE_PASSWORD}
+    jpa:
+      open-in-view: false
+      properties.hibernate:
+        show_sql: true
+        format_sql: true
+        hbm2ddl.auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    database-change-log-lock-table: LIQ_DATABASECHANGELOGLOCK
+    database-change-log-table: LIQ_DATABASECHANGELOG
+    driver-class-name: org.postgresql.Driver
+    liquibase-schema: public
+    password: ${spring.datasource.password}
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+  servlet:
+    multipart:
+      max-file-size: 5MB
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS_URL}:29092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.header: false
+        spring.json.type.mapping: ${kafka.mapping.reservation}
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+      group-id:
+        my-consumer-group-id: "consumer-group-1"
+
+
+kafka:
+  topics:
+    shop-service:
+      request_reservation: product-id
+      response_reservation: amount-available-goods
+  mapping:
+    reservation: messageResponseo:com/zuzex/storageservice/model/dto/MessageResponse
+
+
+eureka:
+  client:
+    fetch-registry: false
+    register-with-eureka: false
+    serviceUrl:
+      defaultZone: http://${EUREKA_URL}:9001/eureka
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+    preferIpAddress: true
+
+app:
+  reserveExpirationMs: 12000000
