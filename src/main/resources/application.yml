@@ -39,11 +39,14 @@ spring:
         spring.json.type.mapping: ${kafka.mapping.reservation}
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      group-id: reservation-group
       properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
         spring.json.trusted.packages: "*"
-      group-id:
-        my-consumer-group-id: "consumer-group-1"
+        spring.json.add.type.header: false
+        spring.json.type.mapping: ${kafka.mapping.get-reservation}
+
 
 
 kafka:
@@ -52,7 +55,8 @@ kafka:
       request_reservation: product-id
       response_reservation: amount-available-goods
   mapping:
-    reservation: messageResponseo:com/zuzex/storageservice/model/dto/MessageResponse
+    reservation: sendMessageResponse:com.zuzex.storageservice.model.dto.MessageResponse
+    get-reservation: sendRequestReservation:com.zuzex.storageservice.model.dto.RequestReservation
 
 
 eureka:

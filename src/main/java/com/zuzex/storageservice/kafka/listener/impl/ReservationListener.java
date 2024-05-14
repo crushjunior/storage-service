@@ -1,10 +1,11 @@
 package com.zuzex.storageservice.kafka.listener.impl;
 
 import com.zuzex.storageservice.kafka.listener.MessageListener;
-import com.zuzex.storageservice.model.dto.ReservationDto;
+import com.zuzex.storageservice.model.dto.RequestReservation;
 import com.zuzex.storageservice.service.ReservationProcessingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -15,14 +16,16 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ReservationListener implements MessageListener<ReservationDto> {
+@KafkaListener(topics = "${kafka.topics.shop-service.request_reservation}",
+        groupId = "${spring.kafka.consumer.group-id}")
+public class ReservationListener implements MessageListener<RequestReservation> {
 
     private final ReservationProcessingService reservationProcessingService;
 
     @Override
-    @KafkaListener(topics = "${kafka.topics.shop-service.request_reservation}",
-            groupId = "${spring.kafka.consumer.group-id.my-consumer-group-id}")
-    public void listenMessage(ReservationDto reservationDto) {
+    @KafkaHandler
+    @KafkaListener(topics = "${kafka.topics.shop-service.request_reservation}")
+    public void listenMessage(RequestReservation reservationDto) {
         log.info("Received available count goods of product: {}" + reservationDto.productId());
         reservationProcessingService.processReserve(reservationDto);
     }

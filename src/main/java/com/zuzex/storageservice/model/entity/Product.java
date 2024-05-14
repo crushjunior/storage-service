@@ -23,7 +23,7 @@ public class Product {
     private Integer amount;
 
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reservation> reservations;
 
     public void addReservation(Reservation reservation) {
