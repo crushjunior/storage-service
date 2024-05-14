@@ -3,7 +3,7 @@ package com.zuzex.storageservice.service.impl;
 import com.zuzex.storageservice.exception.ResourceNotFoundException;
 import com.zuzex.storageservice.kafka.publisher.MessagePublisher;
 import com.zuzex.storageservice.model.dto.MessageResponse;
-import com.zuzex.storageservice.model.dto.ReservationDto;
+import com.zuzex.storageservice.model.dto.RequestReservation;
 import com.zuzex.storageservice.model.entity.Product;
 import com.zuzex.storageservice.model.entity.Reservation;
 import com.zuzex.storageservice.service.ProductService;
@@ -31,7 +31,7 @@ public class ReservationProcessingServiceImpl implements ReservationProcessingSe
 
     @Override
     @Transactional
-    public void processReserve(ReservationDto reservationDto) {
+    public void processReserve(RequestReservation reservationDto) {
         try {
             int availableCount = productService.getQuantityGoods(reservationDto.productId());
 
@@ -40,7 +40,7 @@ public class ReservationProcessingServiceImpl implements ReservationProcessingSe
                         ("No available items for reserve product " + reservationDto.productId());
                 reservationPublisher.publish(messageResponse);
 
-            } else if (availableCount < reservationDto.productId()) {
+            } else if (availableCount < reservationDto.amount()) {
                 MessageResponse messageResponse = new MessageResponse
                         ("You must enter a smaller number of products");
                 reservationPublisher.publish(messageResponse);

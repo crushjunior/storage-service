@@ -1,13 +1,12 @@
 package com.zuzex.storageservice.model.dto;
 
-import lombok.Builder;
+import lombok.*;
 
 import java.util.UUID;
 
 @Builder
-public record ReservationDto(
+public record RequestReservation(
         UUID clientId,
         Long productId,
         Integer amount
-) {
-}
+){}
